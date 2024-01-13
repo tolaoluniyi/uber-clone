@@ -17,7 +17,7 @@ pipeline{
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-scanner') {
-                    sh '''sonar-scanner -Dsonar.projectName=Uber \
+                    sh ''' -Dsonar.projectName=Uber \
                     -Dsonar.projectKey=Uber'''
                 }
             }
