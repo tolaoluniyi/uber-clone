@@ -3,7 +3,6 @@ pipeline{
     tools{
         nodejs 'node16'
     }
-    }
     stages {
         stage('clean workspace'){
             steps{
