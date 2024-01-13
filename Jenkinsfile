@@ -2,6 +2,7 @@ pipeline{
     agent any
     tools{
         nodejs 'node16'
+        SCANNER_HOME = tool 'sonar-scanner'
     }
     stages {
         stage('clean workspace'){
@@ -17,7 +18,7 @@ pipeline{
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('sonar-scanner') {
-                    sh ''' -Dsonar.projectName=Uber \
+                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Uber \
                     -Dsonar.projectKey=Uber'''
                 }
             }
