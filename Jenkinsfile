@@ -18,7 +18,7 @@ pipeline{
                 git branch: 'main', url: 'https://github.com/tkibnyusuf/uber-clone.git'
             }
         }
-        stage("Sonarqube Analysis "){
+        stage("Sonarqube Analysis"){
             steps{
                 withSonarQubeEnv('sonar-scanner') {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Uber \
