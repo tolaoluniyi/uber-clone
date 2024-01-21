@@ -1,81 +1,43 @@
 pipeline{
     agent any
-    tools{
-        jdk 'jdk17'
-        nodejs 'node16'
-    }
-    environment {
-        SCANNER_HOME=tool 'sonar-scanner'
-    } 
     stages {
-        stage('clean workspace'){
-            steps{
-                cleanWs()
-            }
-        }
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/tkibnyusuf/uber-clone.git'
+                git branch: 'main', url: 'https://github.com/SushantOps/uber-clone.git'
             }
         }
-        stage("Sonarqube Analysis"){
-            steps{
-                withSonarQubeEnv('sonar-scanner') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Uber \
-                    -Dsonar.projectKey=Uber'''
-                }
-            }
+        stage('Terraform version'){
+             steps{
+                 sh 'terraform --version'
+             }
         }
-        stage("quality gate"){
-           steps {
-                script {
-                    waitForQualityGate abortPipeline: true, credentialsId: 'admin'
-                }
-            }
+        stage('Terraform init'){
+             steps{
+                 dir('EKS_TERRAFORM') {
+                      sh 'terraform init'
+                   }
+             }
         }
-        stage('Install Dependencies') {
-            steps {
-                sh "npm install"
-            }
+        stage('Terraform validate'){
+             steps{
+                 dir('EKS_TERRAFORM') {
+                      sh 'terraform validate'
+                   }
+             }
         }
-        stage('OWASP FS SCAN') {
-            steps {
-                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
+        stage('Terraform plan'){
+             steps{
+                 dir('EKS_TERRAFORM') {
+                      sh 'terraform plan'
+                   }
+             }
         }
-         stage('TRIVY FS SCAN') {
-            steps {
-                sh "trivy fs . > trivyfs.txt"
-            }
+        stage('Terraform apply/destroy'){
+             steps{
+                 dir('EKS_TERRAFORM') {
+                      sh 'terraform ${action} --auto-approve'
+                   }
+             }
         }
-        stage("Docker Build & Push"){
-            steps{
-                script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh "docker build -t uber ."
-                       sh "docker tag uber tkibnyusuf/uberclone:$BUILD_NUMBER "
-                       sh "docker push tkibnyusuf/uberclone:$BUILD_NUMBER "
-                    }
-                }
-            }
-        }
-        stage("TRIVY"){
-            steps{
-                sh "trivy image tkibnyusuf/uberclone:$BUILD_NUMBER > trivyimage.txt"
-            }
-        }
-        stage('Deploy to kubernetes'){
-            steps{
-                script{
-                    dir('K8S') {
-                        withKubeConfig(caCertificate: '', clusterName: 'myAppp-eks-cluster', contextName: '', credentialsId: 'k8S', namespace: 'default', restrictKubeConfigAccess: false, serverUrl: 'https://268D20529B7C46D1C25E08187C0CB521.gr7.us-east-1.eks.amazonaws.com') {
-                                sh 'kubectl apply -f deployment.yml'
-                                sh 'kubectl apply -f service.yml'
-                        }
-                    }
-                }
-            }
     }
-}
 }
