@@ -31,17 +31,9 @@ data "aws_vpc" "default" {
   default = true
 }
 
-#get public subnets for cluster
-resource "aws_subnet" "my_subnets" {
-  count = length(var.availability_zones)
-
-  vpc_id                  = aws_vpc.my_vpc.id
-  cidr_block              = "10.0.${count.index + 1}.0/24"
-  availability_zone       = var.availability_zones[count.index]
-
-  tags = {
-    Name = "subnet-${count.index + 1}"
-  }
+data "aws_subnet_ids" "my_subnets" {
+  vpc_id = aws_vpc.my_vpc.id
+  availability_zone_names = ["us-east-1a", "us-east-1b", "us-east-1c"]
 }
 #cluster provision
 resource "aws_eks_cluster" "example" {
