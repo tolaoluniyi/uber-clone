@@ -33,6 +33,13 @@ data "aws_subnets" "public" {
   }
 }
 data "aws_availability_zones" "available" {}
+
+# Selecting specific elements from the list
+availability_zones_selected = [
+  element(data.aws_availability_zones.available.names, 0),
+  element(data.aws_availability_zones.available.names, 1),
+  element(data.aws_availability_zones.available.names, 2),
+]
 #cluster provision
 resource "aws_eks_cluster" "example" {
   name     = "EKS_CLOUD"
@@ -40,8 +47,8 @@ resource "aws_eks_cluster" "example" {
 
 
   vpc_config {
-    subnet_ids = datat.aws_subnets.public.ids
-    azs = data.aws_availability_zones.available.[0,1,2] 
+    subnet_ids = data.aws_subnets.public.ids
+    azs = data.aws_availability_zones.available.names 
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
