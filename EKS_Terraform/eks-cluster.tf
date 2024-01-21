@@ -25,11 +25,6 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEKSClusterPolicy" {
 data "aws_vpc" "default" {
   default = true
 }
-
-data "aws_subnet_ids" "my_subnets" {
-  vpc_id = aws_vpc.my_vpc.id
-  availability_zone_names = ["us-east-1a", "us-east-1b", "us-east-1c"]
-}
 #cluster provision
 resource "aws_eks_cluster" "example" {
   name     = "EKS_CLOUD"
