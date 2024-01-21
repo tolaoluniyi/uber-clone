@@ -25,11 +25,22 @@ resource "aws_iam_role_policy_attachment" "example-AmazonEKSClusterPolicy" {
 data "aws_vpc" "default" {
   default = true
 }
+
+data "aws_availability_zones" "available" {}
+
+# Selecting specific elements from the list
+availability_zones_selected = [
+  element(data.aws_availability_zones.available.names, 0),
+  element(data.aws_availability_zones.available.names, 1),
+  element(data.aws_availability_zones.available.names, 2),
+]
 #get public subnets for cluster
 data "aws_subnets" "public" {
+  count = length(data.aws_availability_zones.available.names)
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
+    availability_zone       = element(data.aws_availability_zones.available.names, count.index)
   }
 }
 data "aws_availability_zones" "available" {}
@@ -48,7 +59,6 @@ resource "aws_eks_cluster" "example" {
 
   vpc_config {
     subnet_ids = data.aws_subnets.public.ids
-    azs = data.aws_availability_zones.available.names 
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
