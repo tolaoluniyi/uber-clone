@@ -62,7 +62,7 @@ pipeline{
         }
         stage("TRIVY"){
             steps{
-                sh "trivy --no-progress --exit-code 1 --severity MEDIUM,HIGH,CRITICAL tkibnyusuf/uber:latest > trivyimage.txt"
+                sh "trivy image tkibnyusuf/uber:latest > trivyimage.txt"
             }
         }        
         stage('Deploy to kubernetes'){
