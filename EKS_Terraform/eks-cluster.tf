@@ -11,6 +11,11 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
+variable "availability_zones" {
+  type    = list(string)
+  default = ["us-east-1a", "us-east-1b", "us-east-1c"]
+}
+
 resource "aws_iam_role" "example" {
   name               = "eks-cluster-cloud"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -27,11 +32,17 @@ data "aws_vpc" "default" {
 }
 
 #get public subnets for cluster
-data "aws_subnets" "default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
+resource "aws_subnet" "my_subnets" {
+  count = length(var.availability_zones)
+
+  vpc_id                  = aws_vpc.my_vpc.id
+  cidr_block              = "10.0.${count.index + 1}.0/24"
+  availability_zone       = var.availability_zones[count.index]
+
+  tags = {
+    Name = "subnet-${count.index + 1}"
   }
+}
 }
 #cluster provision
 resource "aws_eks_cluster" "example" {
@@ -40,7 +51,7 @@ resource "aws_eks_cluster" "example" {
 
 
   vpc_config {
-    subnet_ids = data.aws_subnets.default.ids
+    subnet_ids = data.aws_subnets.my_subnets.ids
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
@@ -85,7 +96,7 @@ resource "aws_eks_node_group" "example" {
   cluster_name    = aws_eks_cluster.example.name
   node_group_name = "Node-cloud"
   node_role_arn   = aws_iam_role.example1.arn
-  subnet_ids      = data.aws_subnets.default.ids
+  subnet_ids      = data.aws_subnets.my_subnets.ids
 
   scaling_config {
     desired_size = 1
