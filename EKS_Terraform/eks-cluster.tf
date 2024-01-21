@@ -41,6 +41,7 @@ resource "aws_eks_cluster" "example" {
       "subnet-3cec9f63",
       "subnet-4adfa26b",
       "subnet-39bd9537",
+   ]
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
