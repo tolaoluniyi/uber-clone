@@ -65,7 +65,7 @@ pipeline{
                 sh "trivy image tkibnyusuf/uber:latest > trivyimage.txt"
             }
         }        
-        stage('Deploy to kubernets'){
+        stage('Deploy to kubernetes'){
             steps{
                 script{
                     dir('K8S') {
