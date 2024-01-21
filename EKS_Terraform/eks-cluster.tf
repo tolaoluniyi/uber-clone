@@ -28,29 +28,14 @@ data "aws_vpc" "default" {
 
 data "aws_availability_zones" "available" {}
 
-# Selecting specific elements from the list
-availability_zones_selected = [
-  element(data.aws_availability_zones.available.names, 0),
-  element(data.aws_availability_zones.available.names, 1),
-  element(data.aws_availability_zones.available.names, 2),
-]
 #get public subnets for cluster
 data "aws_subnets" "public" {
-  count = length(data.aws_availability_zones.available.names)
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.default.id]
-    availability_zone       = element(data.aws_availability_zones.available.names, count.index)
+    availability_zone = data.aws_availability_zones.available.names[0,1,2]
   }
 }
-data "aws_availability_zones" "available" {}
-
-# Selecting specific elements from the list
-availability_zones_selected = [
-  element(data.aws_availability_zones.available.names, 0),
-  element(data.aws_availability_zones.available.names, 1),
-  element(data.aws_availability_zones.available.names, 2),
-]
 #cluster provision
 resource "aws_eks_cluster" "example" {
   name     = "EKS_CLOUD"
