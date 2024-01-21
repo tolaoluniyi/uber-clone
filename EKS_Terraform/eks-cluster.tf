@@ -11,6 +11,8 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
+variable subnet_ids {}
+
 resource "aws_iam_role" "example" {
   name               = "eks-cluster-cloud"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
@@ -32,11 +34,7 @@ resource "aws_eks_cluster" "example" {
 
 
   vpc_config {
-        subnet_ids = [
-      "subnet-3cec9f63",
-      "subnet-4adfa26b",
-      "subnet-39bd9537",
-   ]
+        subnet_ids = var.subnet_ids
   }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
@@ -81,7 +79,7 @@ resource "aws_eks_node_group" "example" {
   cluster_name    = aws_eks_cluster.example.name
   node_group_name = "Node-cloud"
   node_role_arn   = aws_iam_role.example1.arn
-  subnet_ids      = ["subnet-3cec9f63","subnet-4adfa26b","subnet-39bd9537"]
+  subnet_ids      = var.subnet_ids
 
   scaling_config {
     desired_size = 1
