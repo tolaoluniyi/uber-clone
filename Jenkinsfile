@@ -2,7 +2,10 @@ pipeline{
     agent any
     environment {
         AWS_ACCOUNT_ID="775012328020"
-        AWS_DEFAULT_REGION="us-east-1"    
+        AWS_DEFAULT_REGION="us-east-1" 
+        AWS_ACCESS_KEY_ID = credentials('aws_access_key_id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key')
+    }
     stages {
         stage('Checkout from Git'){
             steps{
@@ -14,11 +17,7 @@ pipeline{
                  sh 'terraform --version'
              }
         }
-        stage('Terraform init'){
-           environment {
-             AWS_ACCESS_KEY_ID = credentials('aws_access_key_id')
-             AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key')
-           }            
+        stage('Terraform init'){           
            steps{
                 dir('EKS_TERRAFORM') {
                       sh 'terraform init'
@@ -47,5 +46,4 @@ pipeline{
              }
         }
     }
-}
-}    
+}  
