@@ -52,7 +52,7 @@ pipeline{
         stage("Docker Build & Push"){
             steps{
                 script{
-                   withDockerRegistry(credentialsId: 'dockerhub', toolName: 'docker'){
+                   withDockerRegistry(credentialsId: 'dockerpass', toolName: 'docker'){
                        sh "docker build -t uber ."
                        sh "docker tag uber tkibnyusuf/uber:latest "
                        sh "docker push tkibnyusuf/uber:latest "
