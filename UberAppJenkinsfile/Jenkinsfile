@@ -12,14 +12,14 @@ pipeline{
                 cleanWs()
             }
         }
-        // stage('Checkout from Git'){
-        //     steps{
-        //         git branch: 'main', url: 'https://github.com/tkibnyusuf/uber-clone.git'
-        //     }
-        // }
+        stage('Checkout from Git'){
+            steps{
+                git branch: 'main', url: 'https://github.com/tkibnyusuf/uber-clone.git'
+            }
+        }
         stage("Sonarqube Analysis "){
             steps{
-                withSonarQubeEnv('sonar') {
+                withSonarQubeEnv('sonar-scanner') {
                     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=DevsecOp_project \
                     -Dsonar.projectKey=DevsecOp_project'''
                 }
