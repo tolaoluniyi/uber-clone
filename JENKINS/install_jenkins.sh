@@ -58,4 +58,7 @@ echo 'clearing screen...' && sleep 5
 clear
 echo 'jenkins is installed'
 echo 'this is the default password :' $(sudo cat /var/lib/jenkins/secrets/initialAdminPassword)
+sudo apt install -y python3 python3-pip
+pip3 install checkov
+checkov --version
 sudo reboot

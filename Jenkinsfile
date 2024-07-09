@@ -12,6 +12,11 @@ pipeline{
                 git branch: 'main', url: 'https://github.com/tkibnyusuf/uber-clone.git'
             }
         }
+
+        Stage('Checkov Code Scan') {
+                sh git clone https://github.com/tolaoluniyi/uber-clone.git
+                checkov -f $PWD
+        }
         stage('Terraform version'){
              steps{
                  sh 'terraform --version'
