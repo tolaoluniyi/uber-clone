@@ -15,11 +15,12 @@ pipeline{
 
         Stage('Checkov Code Scan') {
                script {
-                    // Install Checkov
+                    //checkov Steps
+                    //1. Install Checkov
+                    //2. Run the Checkov Scan
                     sh """
                         pip install checkov==${env.CHECKOV_VERSION}
                     """
-                    // Run Checkov scan
                     sh """
                         checkov -d .
                     """
