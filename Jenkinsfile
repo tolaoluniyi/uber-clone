@@ -14,8 +14,16 @@ pipeline{
         }
 
         Stage('Checkov Code Scan') {
-                sh git clone https://github.com/tolaoluniyi/uber-clone.git
-                checkov -f $PWD
+               script {
+                    // Install Checkov
+                    sh """
+                        pip install checkov==${env.CHECKOV_VERSION}
+                    """
+                    // Run Checkov scan
+                    sh """
+                        checkov -d .
+                    """
+                }
         }
         stage('Terraform version'){
              steps{
