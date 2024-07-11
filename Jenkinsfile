@@ -10,13 +10,15 @@ pipeline{
     stages {
         stage('Checkout from Git'){
             steps{
-                git branch: 'main', url: 'https://github.com/tkibnyusuf/uber-clone.git'
+                git branch: 'main', url: 'https://github.com/tolaoluniyi/uber-clone.git'
             }
         }
 
         stage('Install Checkov') {
             steps {
                 script {
+                    sudo apt install python3-pip
+                    sudo pip3 install sh
                     def checkovInstalled = sh(script: 'checkov --version', returnStatus: true) == 0
                     if (!checkovInstalled) {
                         sh 'pip install checkov==${CHECKOV_VERSION}'
